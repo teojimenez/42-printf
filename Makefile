@@ -16,7 +16,7 @@ FLAGS = -Wall -Wextra -Werror
 
 all: $(NAME)
 
-SRC = ft_isalnum.c ft_strlen.c ft_memset.c
+SRC = ft_printf.c
 
 OBJECTS = $(SRC:.c=.o)
 CC = gcc

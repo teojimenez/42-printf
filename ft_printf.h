@@ -13,8 +13,10 @@
 # define FT_PRINTF_H
 
 # include "ft_printf.h"
+# include <unistd.h>
+# include <stdarg.h>
+# include <stdlib.h>
 
-int ft_printf(char const *, ...);
-
+int ft_printf(char const * format, ...);
 
 #endif
