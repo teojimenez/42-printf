@@ -18,80 +18,103 @@ static void print_putchar(char c, int *count)
     int x;
 
     x = write(1, &c, 1);
+    (*count) += 1;
     if (x == -1)
-        *count = -1;
-    else
-        count++;
+        *count = -1;       
 }
 
 static void print_str(char *str, int *count)
 {
-    str += 2;
+    if (!str)
+        // print_str("(null)", count);
+        str = "(null)";
     while (*str)
     {
-        print_putchar(*str, &(*count));
+        print_putchar(*str, count);
         str++;
     }
 }
 
-static void print_int(int nb, int *count, int type)
+static void print_int(int nb, int *count)
 {
     if (nb <= -2147483648)
     {
         write(1, "-2147483648", 11);
-        (*count)++;
+        (*count) += 11;
         return ;
     }
     else if (nb < 0)
     {
-        if (type == 0)
-          print_putchar('-', &(*count));
+        print_putchar('-', count);
         nb = -nb;
     }
     if (nb > 9)
     {
-        print_int(nb / 10, &(*count), type);
-        print_int(nb % 10, &(*count), type);
+        print_int(nb / 10, count);
+        print_int(nb % 10, count);
     }
     else
-        print_putchar(nb + '0', &(*count));
+        print_putchar(nb + '0', count);
 }
 
-static void print_hex(int nb, int *count, int type)
+static void print_unsint(unsigned int nb, int *count)
+{
+    if (nb > 9)
+    {
+        print_int(nb / 10, count);
+        print_int(nb % 10, count);
+    }
+    else
+        print_putchar(nb + '0', count);
+}
+
+static void print_hex(unsigned int nb, int *count, int type, int flag)
 {
     char *hex;
+
+    if (nb == 0 && flag > 0)
+    {
+        print_putchar('0', count);
+        return ;
+    } 
+    else if (nb != 0)
+    {
+        flag = 0;
+        hex = "0123456789abcdef";
+        print_hex(nb / 16, count, type, 0);
+        if (type == 1)
+            hex = "0123456789ABCDEF";
+        print_putchar(hex[nb % 16], count);
+    }
     if (nb == 0)
         return ;
-    hex = "0123456789abcdef";
-    print_hex(nb / 16, *(&count), type);
-    if (type == 1)
-        hex = "0123456789ABCDEF";
-    print_putchar(hex[nb % 16], &(*count));
 }
 
 static void  p_format(char *str, va_list args, int *count)
 {
     //va_arg(list, type);
     if (*str == 'c')
-        print_putchar(va_arg(args, int), &(*count));
+        print_putchar(va_arg(args, int), count);
     else if (*str == 's')
-        print_str(va_arg(args, char *), &(*count));
+        print_str(va_arg(args, char *), count);
     else if (*str == 'i') // • %i Imprime un entero en base 10.
-        print_int(va_arg(args, int), &(*count), 0);
+        print_int(va_arg(args, int), count);
     else if (*str == 'd') // • %d Imprime un decimal en base 10.
-        print_int(va_arg(args, int), &(*count), 0);
+        print_int(va_arg(args, int), count);
     else if (*str == 'u') // • %u Imprime un unsigned decimal en base 10.
-        print_int(va_arg(args, int), &(*count), 1);
+        print_unsint(va_arg(args, int), count);
 
     else if (*str == 'p') // • %p El puntero void * dado como argumento se imprime en formato hexadecimal.
-        print_putchar('%', &(*count));
+        print_putchar('%', count);
     else if (*str == 'x') // • %x Imprime un número hexadecimal (base 16) en minúsculas.
-        print_hex(va_arg(args, int), &(*count), 0);
+        print_hex(va_arg(args, int), count, 0, 1);
     else if (*str == 'X') // • %X Imprime un número hexadecimal (base 16) en mayúsculas.
-        print_hex(va_arg(args, int), &(*count), 1);
+        print_hex(va_arg(args, int), count, 1, 1);
 
     else if (*str == '%') // • % % para imprimir el símbolo del porcentaje.
-        print_putchar('%', &(*count));
+        print_putchar('%', count);
+    else
+        *count = -1;
 }
 
 int ft_printf(char const * str, ...)
@@ -116,7 +139,7 @@ int ft_printf(char const * str, ...)
     //si falla el write, counter -1, para que falle todo
     //mientras  no sea % vaya imprimiendo y sumando count y augmentando format para que imprima cada char
     //cuando es % entra en otra funcion que segun el tipo lo evalua y lo imprime
-
+    return (count);
 }
 
 // char *ft_char(char *c)
@@ -124,11 +147,13 @@ int ft_printf(char const * str, ...)
 //   return c;
 // }
 
+// #include <stdio.h>
 // int main() {
-//   ft_printf("Hola %s Me llamo", ft_char("Hola"));
+//   int i = ft_printf("%c %i %s\n", 'h', 12, "Ho");
+//   int j = printf("%c %i %s\n", 'h', 12, "Ho");
+//   printf("%i - %i", i, j);
 //   return 0;
 // }
-
 //va_list -> lista de todos los argumentos
 //va_arg() -> para acceder al argumento (y su tipo)
 //va_arg(argumento(list), tipo)
