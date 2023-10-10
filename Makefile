@@ -10,11 +10,9 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = libftprintf.a;
+NAME = libftprintf.a
 
 FLAGS = -Wall -Wextra -Werror
-
-all: $(NAME)
 
 SRC = ft_printf.c
 
@@ -22,7 +20,9 @@ OBJECTS = $(SRC:.c=.o)
 CC = gcc
 
 $(NAME):	${OBJECTS}
-			ar rc ${NAME} ${OBJECTS}
+		ar rc ${NAME} ${OBJECTS}
+
+all: $(NAME)
 
 clean:
 	rm -rf $(OBJECTS)
