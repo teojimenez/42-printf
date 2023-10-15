@@ -90,6 +90,14 @@ static void print_hex(unsigned int nb, int *count, int type, int flag)
         return ;
 }
 
+static void print_void(unsigned long nb, int *count)
+{
+    print_str("0x", count);
+    if (!nb)
+        print_putchar('0', count);
+    print_hex(nb, count, 0, 1);
+}
+
 static void  p_format(char *str, va_list args, int *count)
 {
     //va_arg(list, type);
@@ -105,12 +113,12 @@ static void  p_format(char *str, va_list args, int *count)
         print_unsint(va_arg(args, int), count);
 
     else if (*str == 'p') // • %p El puntero void * dado como argumento se imprime en formato hexadecimal.
-        print_putchar('%', count);
-    else if (*str == 'x') // • %x Imprime un número hexadecimal (base 16) en minúsculas.
-        print_hex(va_arg(args, int), count, 0, 1);
-    else if (*str == 'X') // • %X Imprime un número hexadecimal (base 16) en mayúsculas.
-        print_hex(va_arg(args, int), count, 1, 1);
+        print_void(va_arg(args, unsigned long), count);
 
+    else if (*str == 'x') // • %x Imprime un número hexadecimal (base 16) en minúsculas.
+        print_hex(va_arg(args, unsigned int), count, 0, 1);
+    else if (*str == 'X') // • %X Imprime un número hexadecimal (base 16) en mayúsculas.
+        print_hex(va_arg(args, unsigned int), count, 1, 1);
     else if (*str == '%') // • % % para imprimir el símbolo del porcentaje.
         print_putchar('%', count);
     else
