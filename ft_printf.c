@@ -31,6 +31,8 @@ static void print_str(char *str, int *count)
     while (*str)
     {
         print_putchar(*str, count);
+        if (*count == -1)
+            return ;
         str++;
     }
 }
@@ -46,6 +48,8 @@ static void print_int(int nb, int *count)
     else if (nb < 0)
     {
         print_putchar('-', count);
+        if (*count == -1)
+            return ;
         nb = -nb;
     }
     if (nb > 9)
@@ -54,7 +58,11 @@ static void print_int(int nb, int *count)
         print_int(nb % 10, count);
     }
     else
+    {
         print_putchar(nb + '0', count);
+        if (*count == -1)
+            return ;
+    }
 }
 
 static void print_unsint(unsigned int nb, int *count)
@@ -65,7 +73,11 @@ static void print_unsint(unsigned int nb, int *count)
         print_int(nb % 10, count);
     }
     else
+    {
         print_putchar(nb + '0', count);
+        if (*count == -1)
+            return ;
+    }
 }
 
 static void print_hex(unsigned int nb, int *count, int type, int flag)
@@ -85,17 +97,34 @@ static void print_hex(unsigned int nb, int *count, int type, int flag)
         if (type == 1)
             hex = "0123456789ABCDEF";
         print_putchar(hex[nb % 16], count);
+        if (*count == -1)
+            return ;
     }
     if (nb == 0)
         return ;
 }
 
-static void print_void(unsigned long nb, int *count)
+static void print_void(unsigned long nb, int *count, int flag)
 {
-    print_str("0x", count);
-    if (!nb)
+    if (flag == 0)
+        print_str("0x", count);
+    if (!nb && flag == 0)
+    {
         print_putchar('0', count);
-    print_hex(nb, count, 0, 1);
+        return ;
+    }
+    flag = 1;
+    char *hex;
+    hex = "0123456789abcdef";
+    if (nb == 0)
+        return ;
+    if (nb != 0)
+    {
+        print_void(nb / 16, count, 1);
+        print_putchar(hex[nb % 16], count);
+        if (*count == -1)
+            return ;
+    }
 }
 
 static void  p_format(char *str, va_list args, int *count)
@@ -113,7 +142,7 @@ static void  p_format(char *str, va_list args, int *count)
         print_unsint(va_arg(args, int), count);
 
     else if (*str == 'p') // • %p El puntero void * dado como argumento se imprime en formato hexadecimal.
-        print_void(va_arg(args, unsigned long), count);
+        print_void(va_arg(args, unsigned long), count, 0);
 
     else if (*str == 'x') // • %x Imprime un número hexadecimal (base 16) en minúsculas.
         print_hex(va_arg(args, unsigned int), count, 0, 1);
