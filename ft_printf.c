@@ -6,7 +6,7 @@
 /*   By: teojimen <teojimen@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/08 19:38:39 by teojimen          #+#    #+#             */
-/*   Updated: 2023/10/08 19:38:39 by teojimen         ###   ########.fr       */
+/*   Updated: 2023/10/17 22:33:20 by teojimen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static void print_putchar(char c, int *count)
     int x;
 
     x = write(1, &c, 1);
-    (*count) += 1;
+    (*count) += x;
     if (x == -1)
         *count = -1;       
 }
@@ -39,9 +39,15 @@ static void print_str(char *str, int *count)
 
 static void print_int(int nb, int *count)
 {
+    if (*count == -1)
+        return ;
     if (nb <= -2147483648)
     {
-        write(1, "-2147483648", 11);
+        if (write(1, "-2147483648", 11) == -1)
+        {
+            (*count) = -1;
+            return ;
+        }
         (*count) += 11;
         return ;
     }
@@ -67,6 +73,8 @@ static void print_int(int nb, int *count)
 
 static void print_unsint(unsigned int nb, int *count)
 {
+    if (*count == -1)
+        return ;
     if (nb > 9)
     {
         print_int(nb / 10, count);
@@ -83,31 +91,38 @@ static void print_unsint(unsigned int nb, int *count)
 static void print_hex(unsigned int nb, int *count, int type, int flag)
 {
     char *hex;
-
     if (nb == 0 && flag > 0)
     {
         print_putchar('0', count);
-        return ;
+        if (*count == -1)
+            return ;
     } 
     else if (nb != 0)
     {
         flag = 0;
         hex = "0123456789abcdef";
         print_hex(nb / 16, count, type, 0);
+        if (*count == -1)
+            return ;
+        //esta aqui porque cuando ya va a imprimir, si el anterior es -1 cuando va a hacer el proximo,
+        //ya sale desde aqui
         if (type == 1)
             hex = "0123456789ABCDEF";
         print_putchar(hex[nb % 16], count);
-        if (*count == -1)
-            return ;
     }
-    if (nb == 0)
-        return ;
+
 }
 
 static void print_void(unsigned long nb, int *count, int flag)
 {
+    if (*count == -1)
+        return ;
     if (flag == 0)
+    {
         print_str("0x", count);
+        if (*count == -1)
+            return ;
+    }
     if (!nb && flag == 0)
     {
         print_putchar('0', count);
