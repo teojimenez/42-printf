@@ -11,187 +11,51 @@
 /* ************************************************************************** */
 
 #include "ft_printf.h"
-# include <stdarg.h>
 
-static void print_putchar(char c, int *count)
+static void	p_format(char *str, va_list args, int *count)
 {
-    int x;
-
-    x = write(1, &c, 1);
-    (*count) += x;
-    if (x == -1)
-        *count = -1;       
+	if (*str == 'c')
+		print_putchar(va_arg(args, int), count);
+	else if (*str == 's')
+		print_str(va_arg(args, char *), count);
+	else if (*str == 'i')
+		print_int(va_arg(args, int), count);
+	else if (*str == 'd')
+		print_int(va_arg(args, int), count);
+	else if (*str == 'u')
+		print_unsint(va_arg(args, int), count);
+	else if (*str == 'p')
+		print_void(va_arg(args, unsigned long), count, 0, "0123456789abcdef");
+	else if (*str == 'x')
+		print_hex(va_arg(args, unsigned int), count, 0, 1);
+	else if (*str == 'X')
+		print_hex(va_arg(args, unsigned int), count, 1, 1);
+	else if (*str == '%')
+		print_putchar('%', count);
+	else
+		*count = -1;
 }
 
-static void print_str(char *str, int *count)
+int	ft_printf(char const *str, ...)
 {
-    if (!str)
-        // print_str("(null)", count);
-        str = "(null)";
-    while (*str)
-    {
-        print_putchar(*str, count);
-        if (*count == -1)
-            return ;
-        str++;
-    }
-}
+	va_list	args;
+	int		count;
 
-static void print_int(int nb, int *count)
-{
-    if (*count == -1)
-        return ;
-    if (nb <= -2147483648)
-    {
-        if (write(1, "-2147483648", 11) == -1)
-        {
-            (*count) = -1;
-            return ;
-        }
-        (*count) += 11;
-        return ;
-    }
-    else if (nb < 0)
-    {
-        print_putchar('-', count);
-        if (*count == -1)
-            return ;
-        nb = -nb;
-    }
-    if (nb > 9)
-    {
-        print_int(nb / 10, count);
-        print_int(nb % 10, count);
-    }
-    else
-    {
-        print_putchar(nb + '0', count);
-        if (*count == -1)
-            return ;
-    }
-}
-
-static void print_unsint(unsigned int nb, int *count)
-{
-    if (*count == -1)
-        return ;
-    if (nb > 9)
-    {
-        print_int(nb / 10, count);
-        print_int(nb % 10, count);
-    }
-    else
-    {
-        print_putchar(nb + '0', count);
-        if (*count == -1)
-            return ;
-    }
-}
-
-static void print_hex(unsigned int nb, int *count, int type, int flag)
-{
-    char *hex;
-    if (nb == 0 && flag > 0)
-    {
-        print_putchar('0', count);
-        if (*count == -1)
-            return ;
-    } 
-    else if (nb != 0)
-    {
-        flag = 0;
-        hex = "0123456789abcdef";
-        print_hex(nb / 16, count, type, 0);
-        if (*count == -1)
-            return ;
-        //esta aqui porque cuando ya va a imprimir, si el anterior es -1 cuando va a hacer el proximo,
-        //ya sale desde aqui
-        if (type == 1)
-            hex = "0123456789ABCDEF";
-        print_putchar(hex[nb % 16], count);
-    }
-
-}
-
-static void print_void(unsigned long nb, int *count, int flag)
-{
-    if (*count == -1)
-        return ;
-    if (flag == 0)
-    {
-        print_str("0x", count);
-        if (*count == -1)
-            return ;
-    }
-    if (!nb && flag == 0)
-    {
-        print_putchar('0', count);
-        return ;
-    }
-    flag = 1;
-    char *hex;
-    hex = "0123456789abcdef";
-    if (nb == 0)
-        return ;
-    if (nb != 0)
-    {
-        print_void(nb / 16, count, 1);
-        print_putchar(hex[nb % 16], count);
-        if (*count == -1)
-            return ;
-    }
-}
-
-static void  p_format(char *str, va_list args, int *count)
-{
-    //va_arg(list, type);
-    if (*str == 'c')
-        print_putchar(va_arg(args, int), count);
-    else if (*str == 's')
-        print_str(va_arg(args, char *), count);
-    else if (*str == 'i') // • %i Imprime un entero en base 10.
-        print_int(va_arg(args, int), count);
-    else if (*str == 'd') // • %d Imprime un decimal en base 10.
-        print_int(va_arg(args, int), count);
-    else if (*str == 'u') // • %u Imprime un unsigned decimal en base 10.
-        print_unsint(va_arg(args, int), count);
-
-    else if (*str == 'p') // • %p El puntero void * dado como argumento se imprime en formato hexadecimal.
-        print_void(va_arg(args, unsigned long), count, 0);
-
-    else if (*str == 'x') // • %x Imprime un número hexadecimal (base 16) en minúsculas.
-        print_hex(va_arg(args, unsigned int), count, 0, 1);
-    else if (*str == 'X') // • %X Imprime un número hexadecimal (base 16) en mayúsculas.
-        print_hex(va_arg(args, unsigned int), count, 1, 1);
-    else if (*str == '%') // • % % para imprimir el símbolo del porcentaje.
-        print_putchar('%', count);
-    else
-        *count = -1;
-}
-
-int ft_printf(char const * str, ...)
-{
-    va_list args;
-    int     count;
-
-    count = 0;
-    va_start(args, str);
-    while (*str && count != -1)
-    {
-        if(*str == '%')
-        {
-            str++; //augmento para saber que retornara el tipo de funcion
-            p_format((char *)str, args, &count);
-        }
-        else
-            print_putchar(*str, &count);
-        str++;
-    }
-    va_end(args);
-    //si falla el write, counter -1, para que falle todo
-    //mientras  no sea % vaya imprimiendo y sumando count y augmentando format para que imprima cada char
-    //cuando es % entra en otra funcion que segun el tipo lo evalua y lo imprime
-    return (count);
+	count = 0;
+	va_start(args, str);
+	while (*str && count != -1)
+	{
+		if (*str == '%')
+		{
+			str++;
+			p_format((char *)str, args, &count);
+		}
+		else
+			print_putchar(*str, &count);
+		str++;
+	}
+	va_end(args);
+	return (count);
 }
 
 // char *ft_char(char *c)
@@ -211,3 +75,11 @@ int ft_printf(char const * str, ...)
 //va_arg(argumento(list), tipo)
 //va_start() -> iniciar los arg
 //va_end() -> finalizar los arg
+
+// • %i Imprime un entero en base 10.
+// • %d Imprime un decimal en base 10.
+// • %u Imprime un unsigned decimal en base 10.
+// • %p El puntero void * dado como argumento se imprime en formato hexadecimal.
+// • %x Imprime un número hexadecimal (base 16) en minúsculas.
+// • %X Imprime un número hexadecimal (base 16) en mayúsculas.
+// • % % para imprimir el símbolo del porcentaje.
