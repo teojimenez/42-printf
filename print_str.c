@@ -18,7 +18,7 @@ void	print_str(char *str, int *count)
 		str = "(null)";
 	while (*str)
 	{
-		print_putchar(*str, count);
+		print_char(*str, count);
 		if (*count == -1)
 			return ;
 		str++;

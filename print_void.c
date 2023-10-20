@@ -24,7 +24,7 @@ void	print_void(unsigned long nb, int *count, int flag, char *hex)
 	}
 	if (!nb && flag == 0)
 	{
-		print_putchar('0', count);
+		print_char('0', count);
 		return ;
 	}
 	flag = 1;
@@ -32,8 +32,8 @@ void	print_void(unsigned long nb, int *count, int flag, char *hex)
 		return ;
 	if (nb != 0)
 	{
-		print_void(nb / 16, count, 1);
-		print_putchar(hex[nb % 16], count);
+		print_void(nb / 16, count, 1, "0123456789abcdef");
+		print_char(hex[nb % 16], count);
 		if (*count == -1)
 			return ;
 	}

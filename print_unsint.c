@@ -23,7 +23,7 @@ void	print_unsint(unsigned int nb, int *count)
 	}
 	else
 	{
-		print_putchar(nb + '0', count);
+		print_char(nb + '0', count);
 		if (*count == -1)
 			return ;
 	}

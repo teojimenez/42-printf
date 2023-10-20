@@ -12,7 +12,7 @@
 
 #include "ft_printf.h"
 
-static void	check_min_number(int nb, int *count)
+static int	check_min_number(int nb, int *count)
 {
 	if (nb <= -2147483648)
 	{
@@ -24,6 +24,7 @@ static void	check_min_number(int nb, int *count)
 		(*count) += 11;
 		return (-1);
 	}
+	return (0);
 }
 
 void	print_int(int nb, int *count)
@@ -34,7 +35,7 @@ void	print_int(int nb, int *count)
 		return ;
 	else if (nb < 0)
 	{
-		print_putchar('-', count);
+		print_char('-', count);
 		if (*count == -1)
 			return ;
 		nb = -nb;
@@ -46,7 +47,7 @@ void	print_int(int nb, int *count)
 	}
 	else
 	{
-		print_putchar(nb + '0', count);
+		print_char(nb + '0', count);
 		if (*count == -1)
 			return ;
 	}

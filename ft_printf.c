@@ -15,7 +15,7 @@
 static void	p_format(char *str, va_list args, int *count)
 {
 	if (*str == 'c')
-		print_putchar(va_arg(args, int), count);
+		print_char(va_arg(args, int), count);
 	else if (*str == 's')
 		print_str(va_arg(args, char *), count);
 	else if (*str == 'i')
@@ -31,7 +31,7 @@ static void	p_format(char *str, va_list args, int *count)
 	else if (*str == 'X')
 		print_hex(va_arg(args, unsigned int), count, 1, 1);
 	else if (*str == '%')
-		print_putchar('%', count);
+		print_char('%', count);
 	else
 		*count = -1;
 }
@@ -51,7 +51,7 @@ int	ft_printf(char const *str, ...)
 			p_format((char *)str, args, &count);
 		}
 		else
-			print_putchar(*str, &count);
+			print_char(*str, &count);
 		str++;
 	}
 	va_end(args);
