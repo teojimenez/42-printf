@@ -23,7 +23,11 @@ SRC = ft_printf.c \
 	print_void.c
 
 OBJECTS = $(SRC:.c=.o)
+
 CC = gcc
+
+%.o:%.c		Makefile ft_printf.h
+			${CC} ${FLAGS} -I ./ -c $< -o $@
 
 $(NAME):	${OBJECTS}
 		ar rc ${NAME} ${OBJECTS}
@@ -34,3 +38,7 @@ clean:
 	rm -rf $(OBJECTS)
 fclean: clean
 	rm -rf $(NAME)
+
+re:	fclean all
+
+.PHONY: 	all clean fclean re

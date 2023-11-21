@@ -32,5 +32,7 @@ void	print_hex(unsigned int nb, int *count, int type, int flag)
 		if (type == 1)
 			hex = "0123456789ABCDEF";
 		print_char(hex[nb % 16], count);
+		if (*count == -1)
+			return ;
 	}
 }

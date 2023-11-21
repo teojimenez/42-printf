@@ -70,6 +70,7 @@ int	ft_printf(char const *str, ...)
 //   printf("%i - %i", i, j);
 //   return 0;
 // }
+
 //va_list -> lista de todos los argumentos
 //va_arg() -> para acceder al argumento (y su tipo)
 //va_arg(argumento(list), tipo)
